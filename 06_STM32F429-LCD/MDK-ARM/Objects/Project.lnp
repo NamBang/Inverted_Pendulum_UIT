@@ -1,0 +1,21 @@
+--cpu=Cortex-M4.fp
+".\objects\core_cm4.o"
+".\objects\system_stm32f4xx.o"
+".\objects\startup_stm32f429_439xx.o"
+".\objects\stm32f4xx_rcc.o"
+".\objects\stm32f4xx_gpio.o"
+".\objects\misc.o"
+".\objects\stm32f4xx_tim.o"
+".\objects\stm32f4xx_flash.o"
+".\objects\stm32f4xx_usart.o"
+".\objects\main.o"
+".\objects\stm32f4xx_it.o"
+".\objects\b_stm32f4_gpio.o"
+".\objects\tm_stm32f4_delay.o"
+".\objects\b_stm32f4_tim.o"
+".\objects\b_stm32f4_usart_1.o"
+".\objects\pid_controller_1.o"
+--strict --scatter ".\Objects\Project.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\Listings\Project.map" -o .\Objects\Project.axf
