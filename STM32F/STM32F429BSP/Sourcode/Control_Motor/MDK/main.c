@@ -6,8 +6,10 @@ PB6 TX
 PB7 RX
 PA6 Channel A
 PA7 channel B
-IN1 PA9
-IN2 PB14
+IN1 PA9 CH2
+PA10 
+PA12
+IN2 PB14 CH2N
 BaudRate = 9600
 */
 /* Include my libraries here */
@@ -35,29 +37,67 @@ void Configure_PD0(void);
 int main()
 {
 //	char data_Buffer[50];
-	char data_Buffer1[50];
+//	char data_Buffer1[50];
 	//xai xung clock ngoai
 	Clock_HSE();
 	Configure_PD0();
-	/* Initialize Encoder */
-	encoder1();
-	/*initialize timer4*/
-	//TIM4_TIME();
-	//TIM1_INIT();
-	//TIM1_PWM(8399);
-	/* Init UART */
-	USART1_Init();
+//	/* Initialize Encoder */
+//	encoder1();
+//	/*initialize timer4*/
+//	TIM4_TIME();
+//	TIM1_INIT();
+//	TIM1_PWM(4199);
+//	/* Init UART */
+//	USART1_Init();
+//	
+//	//PIDInit(&pid,0,0,0,0.015,0,8399,AUTOMATIC,DIRECT);
+//	//set_speed=50.0;
+//	// kp=20 ki=5 kd=70
+////PIDTuningKpSet (&pid,180.0);
+//	//PIDTuningKiSet (&pid,32.0);//100
+//	//PIDTuningKdSet (&pid,10.0);//0.09
+////	PIDSetpointSet(&pid,set_speed);
+//	//USART_SendData(USART1, 'd');
+//	
+//	B_GPIO_Init(GPIOG,GPIO_Pin_13,RCC_AHB1Periph_GPIOG,GPIO_Mode_OUT);
+//	B_GPIO_Init(GPIOG,GPIO_Pin_14,RCC_AHB1Periph_GPIOG,GPIO_Mode_OUT);
+//	
+
+////Enable clock for GPOIG
+RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+//Initialize struct
+GPIO_InitTypeDef GPIO_InitDef;
+ 
+//Pins 13 and 14
+GPIO_InitDef.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_8;
+//Mode output
+GPIO_InitDef.GPIO_Mode = GPIO_Mode_OUT;
+//Output type push-pull
+GPIO_InitDef.GPIO_OType = GPIO_OType_PP;
+//Without pull resistors
+GPIO_InitDef.GPIO_PuPd = GPIO_PuPd_NOPULL;
+//50MHz pin speed
+GPIO_InitDef.GPIO_Speed = GPIO_Speed_50MHz;
+ 
+//Initialize pins on GPIOG port
+GPIO_Init(GPIOA, &GPIO_InitDef);
+GPIO_ResetBits(GPIOA,GPIO_Pin_12);
+Delay_ms(100);
+GPIO_SetBits(GPIOA,GPIO_Pin_8);
 	
-	//PIDInit(&pid,0,0,0,0.015,0,8399,AUTOMATIC,DIRECT);
-	//set_speed=50.0;
-	// kp=20 ki=5 kd=70
-//PIDTuningKpSet (&pid,180.0);
-	//PIDTuningKiSet (&pid,32.0);//100
-	//PIDTuningKdSet (&pid,10.0);//0.09
-//	PIDSetpointSet(&pid,set_speed);
-	//USART_SendData(USART1, 'd');
+		TM_LEDS_Init();
+	/* Init timer */
+	TM_TIMER_Init();
+	/* Init PWM */
+	TM_PWM_Init();
 	while (1) {
-		
+//	GPIO_SetBits(GPIOA,GPIO_Pin_12);
+//	Delay_ms(1000);
+	
+	GPIO_ToggleBits(GPIOA,GPIO_Pin_8);
+		Delay_ms(100);
+	GPIO_ToggleBits(GPIOA,GPIO_Pin_12);
+	Delay_ms(10000);
 //  	set_speed=50.0;
 //		// kp=20 ki=5 kd=70
 //		PIDTuningKpSet (&pid,170.0);
@@ -72,18 +112,25 @@ int main()
 //		TIM1_PWM(duty);
 		
 		// de xuat tranh truong hop bi tran 
-		count_temp12 = (int32_t)TIM3->CNT;
-		if(count_temp12 > 32767)
-			count_temp12 -= 65535;
-		else if(count_temp12 < -32767)
-			count_temp12 += 65535;
-		
-	  sprintf(data_Buffer1, "count: %d\r\n",count_temp12);//338
-		USART_PutString(data_Buffer1);
-		//Delay_ms(1000);
-//		sprintf(data_Buffer1, "\r\n%d ",RMP);//338
+//		count_temp12 = (int32_t)TIM3->CNT;
+//		if(count_temp12 > 32767)
+//			count_temp12 -= 65535;
+//		else if(count_temp12 < -32767)
+//			count_temp12 += 65535;
+//		
+//	  sprintf(data_Buffer1, "count: %d\r\n",count_temp12);//338
 //		USART_PutString(data_Buffer1);
-		
+//		Delay_ms(1000);
+//		
+//	//	GPIO_ToggleBits(GPIOA,GPIO_Pin_12);
+////		GPIO_ToggleBits(GPIOA,GPIO_Pin_10);
+//		Delay_ms(1000);
+//		
+//		GPIO_ToggleBits(GPIOG, GPIO_Pin_13 | GPIO_Pin_14);
+//		Delay_ms(10000);
+////		sprintf(data_Buffer1, "\r\n%d ",RMP);//338
+////		USART_PutString(data_Buffer1);
+//		
 	}
 }
 

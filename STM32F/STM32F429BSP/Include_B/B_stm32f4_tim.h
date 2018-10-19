@@ -12,4 +12,10 @@ int32_t Encoder2_Get_Counter(void);
 void TIM4_TIME(void);
 void TIM1_INIT(void);
 void TIM1_PWM(__IO uint32_t Pulse );
+	
+		void TM_LEDS_Init(void);
+	/* Init timer */
+	void TM_TIMER_Init(void);
+	/* Init PWM */
+	void TM_PWM_Init(void);
 #endif
