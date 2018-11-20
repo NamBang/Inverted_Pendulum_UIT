@@ -13,6 +13,8 @@ PB7_Channel2
 Timer1:
 PA8_Channel1
 
+Timer2: d?nh th?i de dieu chinh
+
 GPIO: 
 PA12
 PA14

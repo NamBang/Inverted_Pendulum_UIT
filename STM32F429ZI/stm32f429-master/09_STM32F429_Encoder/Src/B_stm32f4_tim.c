@@ -47,6 +47,7 @@ void TIM1_INIT(void)
   TIM_CtrlPWMOutputs(TIM1, ENABLE);
 	
 }
+
 void TIM1_PWM(__IO uint32_t Pulse )
 {
 	
@@ -99,6 +100,7 @@ void TIM1_PWM(__IO uint32_t Pulse )
 	GPIO_SetBits(GPIOA,GPIO_Pin_14);
 
 }
+
 //use timer 3 count pulse 
 void encoder1(void)
 {
@@ -156,6 +158,7 @@ void encoder1(void)
 	TIM_Cmd(TIM3,ENABLE);	
 }
 
+//use timer4 counted
 void encoder2()
 {
 	TIM_ICInitTypeDef 				TIM_ICInitStructure;
@@ -212,5 +215,39 @@ void encoder2()
 }
 
 
+//Timer 2 compute rmp
 
+void TIM2_TIME(void)
+{
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2 , ENABLE);
+  TIM_TimeBaseInitTypeDef 	TIM_TimeBaseInitStructure;
+	NVIC_InitTypeDef					NVIC_InitStructure;
+	
+	// TIM4 configuration 
+	TIM_TimeBaseInitStructure.TIM_Period = 499; // delay 100ms/999  300ms/9     
+	TIM_TimeBaseInitStructure.TIM_Prescaler = (8399);	 //10khz// do no dem tu 0
+	TIM_TimeBaseInitStructure.TIM_ClockDivision = 0x0;    
+	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;  
+	TIM_TimeBaseInit(TIM2,&TIM_TimeBaseInitStructure);
+	
+	// Clear TIM2 update pending flags 
+	TIM_ClearFlag(TIM2, TIM_FLAG_Update);
+	
+	//Enable TIM2 Update interrupts 
+	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
+	
+	/* 2 bit for pre-emption priority, 2 bits for subpriority */
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);
+	
+	// Enable the TIM4 global Interrupt 
+  NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+	
+	//TIM enable counter 
+	TIM_Cmd(TIM2, ENABLE);	
+	
+}
 

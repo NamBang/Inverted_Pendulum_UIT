@@ -37,15 +37,16 @@
 #include "stdio.h"
 #include "B_stm32f4_usart.h"
 #include "pid_controller.h"
-extern __IO int32_t count_temp1,count,count_temp2,count_temp22;
-extern __IO int32_t RMP;
-extern __IO int32_t count_encoder ;
-extern __IO int32_t count_encoder2 ;
+
+//extern variable
+extern __IO int32_t count_temp1;
+extern __IO int32_t RMP,PSP;
 extern __IO int32_t count_recent1;
-extern __IO int32_t  count_update1;
-extern __IO int32_t  change;
-extern __IO uint16_t duty, speed, set_speed;
+extern __IO int32_t  count_update1,PSP_Update;
+extern __IO uint16_t duty,Pule;
 extern PIDControl pid;
+
+//define he so beta
 #define LPF_Beta 0.25
 __IO int32_t RMP_Update;
 /** @addtogroup STM32F4xx_StdPeriph_Examples
@@ -184,17 +185,46 @@ void TIM3_IRQHandler(void)
 
 void TIM4_IRQHandler(void)
 {
-	if(TIM_GetFlagStatus(TIM4,TIM_FLAG_Update)==SET)
-	{
-		if(TIM4->CR1 & 0x10) // check direction
-		{
-			count_temp1 -= 0xFFFF;
-		}
-		else
-		{
-			count_temp1 += 0xFFFF;
-		}
-		TIM_ClearFlag(TIM4,TIM_FLAG_Update);
-	}
+
 }
+
+void TIM2_IRQHandler(void)
+{
+	if (TIM_GetFlagStatus(TIM2, TIM_FLAG_Update)==SET)
+	{
+		count_recent1 = count_temp1 + TIM3->CNT;
+		TIM_ClearFlag(TIM2, TIM_FLAG_Update);
+		if(count_recent1 > count_update1)
+		{
+			PSP=((count_recent1-count_update1));
+		}
+		else if (count_recent1 < count_update1)
+		{
+			PSP=-((count_recent1-count_update1));
+		}
+		else if (count_recent1 == count_update1)
+		{
+			PSP=0.0;
+		}
+	}
+	
+	PSP = PSP_Update-LPF_Beta*(PSP_Update-PSP);
+	PIDInputSet(&pid,PSP);
+	PIDCompute(&pid);
+	duty=PIDOutputGet(&pid);
+	TIM1_PWM(duty);
+	PSP_Update=PSP;
+	count_update1 = count_temp1 + TIM3->CNT;
+}
+
+	
+//	//SmoothData = SmoothData - (LPF_Beta * (SmoothData - RawData));
+//		RMP=RMP_Update-LPF_Beta*(RMP_Update-RMP);
+//	// tinh khoang thoi gian no tinh toan thi dong co quay duoc bao nhieu
+//		PIDInputSet(&pid,(float)(RMP));
+//		PIDCompute(&pid);
+//		duty=PIDOutputGet(&pid);
+//		TIM1_PWM(duty);
+//		RMP_Update=RMP;
+
 

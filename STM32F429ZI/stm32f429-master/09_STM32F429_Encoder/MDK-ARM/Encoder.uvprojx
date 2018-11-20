@@ -486,6 +486,11 @@
               <FileType>5</FileType>
               <FilePath>..\Inc\stm32f4xx_it.h</FilePath>
             </File>
+            <File>
+              <FileName>pid_controller.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\pid_controller.c</FilePath>
+            </File>
           </Files>
         </Group>
       </Groups>

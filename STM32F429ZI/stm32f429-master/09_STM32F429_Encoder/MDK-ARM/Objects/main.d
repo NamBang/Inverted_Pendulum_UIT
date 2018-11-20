@@ -45,3 +45,5 @@
 .\objects\main.o: ..\Inc\B_stm32f4_tim.h
 .\objects\main.o: ..\..\..\Stm32F429 library\My_Library\inc\B_stm32f4_gpio.h
 .\objects\main.o: ..\Inc\stm32f4xx_it.h
+.\objects\main.o: ..\Inc\pid_controller.h
+.\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
