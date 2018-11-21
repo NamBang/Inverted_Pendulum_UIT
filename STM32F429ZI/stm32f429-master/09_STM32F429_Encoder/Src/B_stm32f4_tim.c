@@ -107,7 +107,7 @@ void encoder1(void)
 	
 	TIM_ICInitTypeDef TIM_ICInitStructure;
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
-	NVIC_InitTypeDef					NVIC_InitStructure;
+//	NVIC_InitTypeDef					NVIC_InitStructure;
 	
 	//enable colck for timers
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3,ENABLE);
@@ -137,22 +137,22 @@ void encoder1(void)
 	/*Reset Counter 1*/
 	TIM_SetCounter(TIM3, 0);	
 	
-	/*Clear Interrupt Update flag 1*/
-	TIM_ClearFlag(TIM3, TIM_FLAG_Update);
-	
-	/*Enable Update Interrupt of 2ng TIMER*/
-	TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
-	
-	/* 2 bit for pre-emption priority, 2 bits for subpriority */
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-	
-	/*Configure NVIC for Encoder Interface Update Interrupt 1*/
-	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE ;
-	NVIC_Init(&NVIC_InitStructure);
-	Num_Encoder_1=0;
+//	/*Clear Interrupt Update flag 1*/
+//	TIM_ClearFlag(TIM3, TIM_FLAG_Update);
+//	
+//	/*Enable Update Interrupt of 2ng TIMER*/
+//	TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+//	
+//	/* 2 bit for pre-emption priority, 2 bits for subpriority */
+//	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);
+//	
+//	/*Configure NVIC for Encoder Interface Update Interrupt 1*/
+//	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=3;
+//	NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
+//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE ;
+//	NVIC_Init(&NVIC_InitStructure);
+//	Num_Encoder_1=0;
 	
 	/*Enable 1nd Timer */
 	TIM_Cmd(TIM3,ENABLE);	
@@ -163,7 +163,7 @@ void encoder2()
 {
 	TIM_ICInitTypeDef 				TIM_ICInitStructure;
 	TIM_TimeBaseInitTypeDef   TIM_TimeBaseInitStructure;
-	NVIC_InitTypeDef					NVIC_InitStructure;
+//NVIC_InitTypeDef					NVIC_InitStructure;
 	
 	//enable colck for timers
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4,ENABLE);
@@ -193,22 +193,22 @@ void encoder2()
 	/*Reset Counter 1*/
 	TIM_SetCounter(TIM4, 0);	
 	
-	/*Clear Interrupt Update flag 1*/
-	TIM_ClearFlag(TIM4, TIM_FLAG_Update);
+//	/*Clear Interrupt Update flag 1*/
+//	TIM_ClearFlag(TIM4, TIM_FLAG_Update);
 	
-	/*Enable Update Interrupt of 2ng TIMER*/
-	TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
-	
-	/* 2 bit for pre-emption priority, 2 bits for subpriority */
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-	
-	/*Configure NVIC for Encoder Interface Update Interrupt 1*/
-	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=0;
-	NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
-	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE ;
-	NVIC_Init(&NVIC_InitStructure);
-	Num_Encoder_1=0;
+//	/*Enable Update Interrupt of 2ng TIMER*/
+//	TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
+//	
+//	/* 2 bit for pre-emption priority, 2 bits for subpriority */
+//	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+//	
+//	/*Configure NVIC for Encoder Interface Update Interrupt 1*/
+//	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=2;
+//	NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
+//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE ;
+//	NVIC_Init(&NVIC_InitStructure);
+//	Num_Encoder_1=0;
 	
 	/*Enable 1nd Timer */
 	TIM_Cmd(TIM4,ENABLE);	
@@ -224,8 +224,8 @@ void TIM2_TIME(void)
 	NVIC_InitTypeDef					NVIC_InitStructure;
 	
 	// TIM4 configuration 
-	TIM_TimeBaseInitStructure.TIM_Period = 499; // delay 100ms/999  300ms/9     
-	TIM_TimeBaseInitStructure.TIM_Prescaler = (8399);	 //10khz// do no dem tu 0
+	TIM_TimeBaseInitStructure.TIM_Period = 299; // delay 100ms/999  300ms/9     
+	TIM_TimeBaseInitStructure.TIM_Prescaler= (8399);	 //10khz// do no dem tu 0
 	TIM_TimeBaseInitStructure.TIM_ClockDivision = 0x0;    
 	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;  
 	TIM_TimeBaseInit(TIM2,&TIM_TimeBaseInitStructure);
@@ -237,7 +237,7 @@ void TIM2_TIME(void)
 	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
 	
 	/* 2 bit for pre-emption priority, 2 bits for subpriority */
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
 	
 	// Enable the TIM4 global Interrupt 
   NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;

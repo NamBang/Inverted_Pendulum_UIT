@@ -40,11 +40,13 @@
 
 //extern variable
 extern __IO int32_t count_temp1;
-extern __IO int32_t RMP,PSP;
+extern __IO int32_t RMP,PSP,p_encoder,p_encoder_temp,PSP_encoder;
 extern __IO int32_t count_recent1;
 extern __IO int32_t  count_update1,PSP_Update;
 extern __IO uint16_t duty,Pule;
 extern PIDControl pid;
+
+volatile uint8_t cnt=0;
 
 //define he so beta
 #define LPF_Beta 0.25
@@ -166,55 +168,66 @@ void SysTick_Handler(void)
 }
 
 
-void TIM3_IRQHandler(void)
-{
-	if(TIM_GetFlagStatus(TIM3,TIM_FLAG_Update)==SET)
-	{
-		if(TIM3->CR1 & 0x10) // check direction
-		{
-			count_temp1 -= 0xFFFF;
-		}
-		else
-		{
-			count_temp1 += 0xFFFF;
-		}
-		TIM_ClearFlag(TIM3,TIM_FLAG_Update);
-	}
-	
-}
+//void TIM3_IRQHandler(void)
+//{
+//	if(TIM_GetFlagStatus(TIM3,TIM_FLAG_Update)==SET)
+//	{
+//		if(TIM3->CR1 & 0x10) // check direction
+//		{
+//			count_temp1 -= 0xFFFF;
+//		}
+//		else
+//		{
+//			count_temp1 += 0xFFFF;
+//		}
+//		TIM_ClearFlag(TIM3,TIM_FLAG_Update);
+//	}
+//	
+//}
 
-void TIM4_IRQHandler(void)
-{
+//void TIM4_IRQHandler(void)
+//{
 
-}
+//}
 
 void TIM2_IRQHandler(void)
 {
 	if (TIM_GetFlagStatus(TIM2, TIM_FLAG_Update)==SET)
 	{
-		count_recent1 = count_temp1 + TIM3->CNT;
+		//count_recent1 = count_temp1 + TIM3->CNT;
+
+		count_recent1 =  TIM3->CNT;
 		TIM_ClearFlag(TIM2, TIM_FLAG_Update);
 		if(count_recent1 > count_update1)
 		{
 			PSP=((count_recent1-count_update1));
 		}
-		else if (count_recent1 < count_update1)
+		else if (count_recent1 <= count_update1)
 		{
 			PSP=-((count_recent1-count_update1));
 		}
-		else if (count_recent1 == count_update1)
+				p_encoder = TIM4->CNT;
+		if(p_encoder > p_encoder_temp)
 		{
-			PSP=0.0;
+			PSP_encoder=(p_encoder - p_encoder_temp);
+			if(PSP_encoder > 0xAAAA)
+				PSP_encoder = 0xFFFF - PSP_encoder;
 		}
-	}
+		else if (p_encoder < p_encoder_temp)
+		{
+			PSP=-(-p_encoder + p_encoder_temp);
+			if(PSP_encoder > 0xAAAA)
+				PSP_encoder = 0xFFFF - PSP_encoder;
+		}
 	
-	PSP = PSP_Update-LPF_Beta*(PSP_Update-PSP);
+	}
+	//PSP = PSP_Update-LPF_Beta*(PSP_Update-PSP);
 	PIDInputSet(&pid,PSP);
 	PIDCompute(&pid);
 	duty=PIDOutputGet(&pid);
 	TIM1_PWM(duty);
-	PSP_Update=PSP;
-	count_update1 = count_temp1 + TIM3->CNT;
+	p_encoder_temp = TIM4->CNT;
+	count_update1 = TIM3->CNT;
 }
 
 	
