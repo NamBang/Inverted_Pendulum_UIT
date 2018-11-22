@@ -185,10 +185,10 @@ void SysTick_Handler(void)
 //	
 //}
 
-//void TIM4_IRQHandler(void)
-//{
+void TIM4_IRQHandler(void)
+{
 
-//}
+}
 
 void TIM2_IRQHandler(void)
 {
@@ -206,28 +206,32 @@ void TIM2_IRQHandler(void)
 		{
 			PSP=-((count_recent1-count_update1));
 		}
+		//if(cnt>=20){
 				p_encoder = TIM4->CNT;
-		if(p_encoder > p_encoder_temp)
-		{
-			PSP_encoder=(p_encoder - p_encoder_temp);
-			if(PSP_encoder > 0xAAAA)
-				PSP_encoder = 0xFFFF - PSP_encoder;
-		}
-		else if (p_encoder < p_encoder_temp)
-		{
-			PSP=-(-p_encoder + p_encoder_temp);
-			if(PSP_encoder > 0xAAAA)
-				PSP_encoder = 0xFFFF - PSP_encoder;
-		}
+		if(p_encoder > 0xAAAA && p_encoder_temp > 0xAAAA){
+			if(p_encoder > p_encoder_temp)
+				PSP_encoder=(p_encoder - p_encoder_temp);
+			else if (p_encoder < p_encoder_temp)
+				PSP_encoder=-(-p_encoder + p_encoder_temp);
+	}
+		if(p_encoder < 0xAAAA && p_encoder_temp < 0xAAAA){
+			if(p_encoder > p_encoder_temp)
+				PSP_encoder=-(p_encoder - p_encoder_temp);
+			else if (p_encoder < p_encoder_temp)
+				PSP_encoder=(-p_encoder + p_encoder_temp);
+	}
+		//cnt =0;
+	//}
 	
 	}
-	//PSP = PSP_Update-LPF_Beta*(PSP_Update-PSP);
-	PIDInputSet(&pid,PSP);
-	PIDCompute(&pid);
-	duty=PIDOutputGet(&pid);
-	TIM1_PWM(duty);
+//	PSP = PSP_Update-LPF_Beta*(PSP_Update-PSP);
+//	PIDInputSet(&pid,PSP);
+//	PIDCompute(&pid);
+//	duty=PIDOutputGet(&pid);
+//	TIM1_PWM(duty);
 	p_encoder_temp = TIM4->CNT;
 	count_update1 = TIM3->CNT;
+	//cnt++;
 }
 
 	

@@ -28,6 +28,13 @@ PA10 RX
  __IO uint16_t duty,Pule,speed, set_speed;
  PIDControl pid;
  __IO int32_t count_e1=0,count_e2=0;
+ void quay(uint32_t psp_encoder){
+	if(psp_encoder > 0){
+		control_PWM1(8399,0);
+	}else{
+		control_PWM1(8399,1);
+	}
+}
 
 int main()
 {
@@ -41,7 +48,9 @@ int main()
 	encoder2();
 	USART1_Init();
 	TIM2_TIME();
-	TIM1_PWM(8399);
+	//TIM1_PWM(8399);
+	
+	//TIM1_PWM(8399);
 	
 	PIDInit(&pid,0,0,0,0.03,0,8399,AUTOMATIC,DIRECT);
 	set_speed=60;
@@ -55,6 +64,8 @@ int main()
 		USART_PutString(data_Buffer2);
 		sprintf(data_Buffer2, "PSP_encoder: %d\r\n",PSP_encoder);//338
 		USART_PutString(data_Buffer2);
-		
+		//quay(PSP_encoder);
 	}
 }
+
+

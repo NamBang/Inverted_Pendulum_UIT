@@ -914,7 +914,7 @@ vers\CMSIS\Device\ST\STM32F4xx\Include -IC:\Keil_v5\ARM\CMSIS\Include --predefi
 ARM Macro Assembler    Page 15 
 
 
-ne="__UVISION_VERSION SETA 525" --predefine="STM32F429xx SETA 1" --list=.\listi
+ne="__UVISION_VERSION SETA 526" --predefine="STM32F429xx SETA 1" --list=.\listi
 ngs\startup_stm32f429_439xx.lst "..\..\..\Stm32F429 library\StartUp\startup_stm
 32f429_439xx.s"
 

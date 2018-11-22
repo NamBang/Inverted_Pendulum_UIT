@@ -1,7 +1,7 @@
 #include "B_stm32f4_tim.h"
 #include "tm_stm32f4_delay.h"
 #include "B_stm32f4_usart.h"
-
+ TIM_OCInitTypeDef TIM_OCInitStructure;
 /* Encoder variables */
 __IO int32_t Num_Encoder_1;
 void TIM1_INIT(void)
@@ -53,7 +53,7 @@ void TIM1_PWM(__IO uint32_t Pulse )
 	
 	
 	/*Configure PWM*/
-  TIM_OCInitTypeDef TIM_OCInitStructure;
+ 
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;//choose mode pwm1 oc: output compare
 	/*Chon muc cao cho dau ra, neu chon muc thap thi no se bi dao nguoc hinh dang dau ra, chu ky tan so deu nhu nhau*/
 	TIM_OCInitStructure.TIM_OutputState	=	TIM_OutputState_Enable;
@@ -92,13 +92,22 @@ void TIM1_PWM(__IO uint32_t Pulse )
 	GPIO_InitDef.GPIO_PuPd = GPIO_PuPd_NOPULL;
 	//50MHz pin speed
 	GPIO_InitDef.GPIO_Speed = GPIO_Speed_50MHz;
-	 
+	 GPIO_Init(GPIOA, &GPIO_InitDef);
 	//Initialize pins on GPIOG port
-	GPIO_Init(GPIOA, &GPIO_InitDef);
 	GPIO_ResetBits(GPIOA,GPIO_Pin_12);
-	Delay_ms(100);
-	GPIO_SetBits(GPIOA,GPIO_Pin_14);
+		GPIO_SetBits(GPIOA,GPIO_Pin_14);
 
+}
+
+void control_PWM1(__IO uint32_t Pulse,__IO uint8_t chieu ){
+	TIM_OCInitStructure.TIM_Pulse=Pulse;
+	if(chieu==1){
+		GPIO_ResetBits(GPIOA,GPIO_Pin_12);
+		GPIO_SetBits(GPIOA,GPIO_Pin_14);
+	}else{
+		GPIO_ResetBits(GPIOA,GPIO_Pin_14);
+		GPIO_SetBits(GPIOA,GPIO_Pin_12);
+	}
 }
 
 //use timer 3 count pulse 
@@ -224,7 +233,7 @@ void TIM2_TIME(void)
 	NVIC_InitTypeDef					NVIC_InitStructure;
 	
 	// TIM4 configuration 
-	TIM_TimeBaseInitStructure.TIM_Period = 299; // delay 100ms/999  300ms/9     
+	TIM_TimeBaseInitStructure.TIM_Period = 399; // delay 100ms/999  300ms/9     
 	TIM_TimeBaseInitStructure.TIM_Prescaler= (8399);	 //10khz// do no dem tu 0
 	TIM_TimeBaseInitStructure.TIM_ClockDivision = 0x0;    
 	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;  

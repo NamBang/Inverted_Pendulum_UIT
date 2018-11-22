@@ -12,5 +12,6 @@ int32_t Encoder2_Get_Counter(void);
 void TIM4_TIME(void);
 void TIM1_INIT(void);
 void TIM1_PWM(__IO uint32_t Pulse );
+void control_PWM1(__IO uint32_t Pulse,__IO uint8_t chieu );
 void TIM2_TIME(void);
 #endif
