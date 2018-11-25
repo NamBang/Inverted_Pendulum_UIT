@@ -1,5 +1,6 @@
 .\objects\main.o: main.c
 .\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
 .\objects\main.o: ..\..\..\Stm32F429 library\CMSIS\Include\stm32f4xx.h
 .\objects\main.o: ..\..\..\Stm32F429 library\CMSIS\Include\core_cm4.h
 .\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
@@ -47,3 +48,5 @@
 .\objects\main.o: ..\Inc\stm32f4xx_it.h
 .\objects\main.o: ..\Inc\pid_controller.h
 .\objects\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h
+.\objects\main.o: ..\Inc\B_stm32f4_dma.h
+.\objects\main.o: ..\..\..\Stm32F429 library\My_Library\inc\B_stm32f4_usart.h

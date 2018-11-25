@@ -56,7 +56,7 @@
 void RCC_WaitForPLLSturtUp(void);
 void Clock_HSE(void);
 /* GPIO_Pin=B_GPIO_Pin*/
-void B_GPIO_Init(GPIO_TypeDef* GPIOx,uint16_t B_GPIO_Pin,uint32_t RCC_AHB1Periph_GPIOx,uint16_t GPIO_Mode);
+void B_GPIO_Init(GPIO_TypeDef* GPIOx,uint16_t B_GPIO_Pin,uint32_t RCC_AHB1Periph_GPIOx,GPIOMode_TypeDef GPIO_Mode);
 void B_GPIO_InitAlternate(GPIO_TypeDef* GPIOx,uint16_t B_GPIO_Pin,uint32_t RCC_AHB1Periph_GPIOx,uint8_t Alternate);
 void Config_Button_Led(void);
 #endif

@@ -184,7 +184,6 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
-            <RvdsMve>0</RvdsMve>
             <hadIRAM2>1</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -447,6 +446,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\Stm32F429 library\STM32F4xx_StdPeriph_Driver\src\misc.c</FilePath>
             </File>
+            <File>
+              <FileName>stm32f4xx_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\Stm32F429 library\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32f4xx_dma2d.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\Stm32F429 library\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma2d.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -491,6 +500,11 @@
               <FileName>pid_controller.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\pid_controller.c</FilePath>
+            </File>
+            <File>
+              <FileName>B_stm32f4_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\B_stm32f4_dma.c</FilePath>
             </File>
           </Files>
         </Group>

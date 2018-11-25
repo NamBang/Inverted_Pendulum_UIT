@@ -40,7 +40,8 @@
 
 //extern variable
 extern __IO int32_t count_temp1;
-extern __IO int32_t RMP,PSP,p_encoder,p_encoder_temp,PSP_encoder;
+extern __IO int32_t RMP,p_encoder,p_encoder_temp,PSP_encoder;
+extern __IO  float PSP;
 extern __IO int32_t count_recent1;
 extern __IO int32_t  count_update1,PSP_Update;
 extern __IO uint16_t duty,Pule;
@@ -185,10 +186,10 @@ void SysTick_Handler(void)
 //	
 //}
 
-void TIM4_IRQHandler(void)
-{
+//void TIM4_IRQHandler(void)
+//{
 
-}
+//}
 
 void TIM2_IRQHandler(void)
 {
@@ -200,48 +201,43 @@ void TIM2_IRQHandler(void)
 		TIM_ClearFlag(TIM2, TIM_FLAG_Update);
 		if(count_recent1 > count_update1)
 		{
-			PSP=((count_recent1-count_update1));
+			PSP=(float)((count_recent1-count_update1));
 		}
 		else if (count_recent1 <= count_update1)
 		{
-			PSP=-((count_recent1-count_update1));
+			PSP=0.0-(float)((count_recent1-count_update1));
 		}
+		
 		//if(cnt>=20){
-				p_encoder = TIM4->CNT;
-		if(p_encoder > 0xAAAA && p_encoder_temp > 0xAAAA){
-			if(p_encoder > p_encoder_temp)
-				PSP_encoder=(p_encoder - p_encoder_temp);
-			else if (p_encoder < p_encoder_temp)
-				PSP_encoder=-(-p_encoder + p_encoder_temp);
-	}
-		if(p_encoder < 0xAAAA && p_encoder_temp < 0xAAAA){
-			if(p_encoder > p_encoder_temp)
-				PSP_encoder=-(p_encoder - p_encoder_temp);
-			else if (p_encoder < p_encoder_temp)
-				PSP_encoder=(-p_encoder + p_encoder_temp);
+//				p_encoder = TIM4->CNT;
+//		if(p_encoder > 0xAAAA && p_encoder_temp > 0xAAAA){
+//			if(p_encoder > p_encoder_temp)
+//				PSP_encoder=(p_encoder - p_encoder_temp);
+//			else if (p_encoder < p_encoder_temp)
+//				PSP_encoder=-(-p_encoder + p_encoder_temp);
+//	}
+//		if(p_encoder < 0xAAAA && p_encoder_temp < 0xAAAA){
+//			if(p_encoder > p_encoder_temp)
+//				PSP_encoder=-(p_encoder - p_encoder_temp);
+//			else if (p_encoder < p_encoder_temp)
+//				PSP_encoder=(-p_encoder + p_encoder_temp);
 	}
 		//cnt =0;
 	//}
 	
-	}
-//	PSP = PSP_Update-LPF_Beta*(PSP_Update-PSP);
-//	PIDInputSet(&pid,PSP);
-//	PIDCompute(&pid);
-//	duty=PIDOutputGet(&pid);
-//	TIM1_PWM(duty);
-	p_encoder_temp = TIM4->CNT;
+	//}
+	PSP = PSP_Update-LPF_Beta*(PSP_Update-PSP);
+	PIDInputSet(&pid,PSP);
+	PIDCompute(&pid);
+	duty=PIDOutputGet(&pid);
+	TIM1_PWM(duty);
 	count_update1 = TIM3->CNT;
+	
+	
+//	p_encoder_temp = TIM4->CNT;
+	
 	//cnt++;
 }
 
-	
-//	//SmoothData = SmoothData - (LPF_Beta * (SmoothData - RawData));
-//		RMP=RMP_Update-LPF_Beta*(RMP_Update-RMP);
-//	// tinh khoang thoi gian no tinh toan thi dong co quay duoc bao nhieu
-//		PIDInputSet(&pid,(float)(RMP));
-//		PIDCompute(&pid);
-//		duty=PIDOutputGet(&pid);
-//		TIM1_PWM(duty);
-//		RMP_Update=RMP;
 
 

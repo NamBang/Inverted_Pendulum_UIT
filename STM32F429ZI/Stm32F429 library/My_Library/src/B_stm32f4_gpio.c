@@ -64,7 +64,7 @@ void Config_Button_Led(void)
 }
 
 //Thêm câu lệnh này trước lúc khởi tạo 	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG,ENABLE);
-void B_GPIO_Init(GPIO_TypeDef* GPIOx,uint16_t B_GPIO_Pin,uint32_t RCC_AHBxPeriph_GPIOx,uint16_t GPIO_Modex )
+void B_GPIO_Init(GPIO_TypeDef* GPIOx,uint16_t B_GPIO_Pin,uint32_t RCC_AHBxPeriph_GPIOx,GPIOMode_TypeDef GPIO_Modex )
 {	
 	GPIO_InitTypeDef GPIO_InitDef;
 	//Enable clock for GPOIG

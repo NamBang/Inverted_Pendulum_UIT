@@ -4,7 +4,7 @@
 
 static void USARTx_NVIC(USART_TypeDef* USARTx,uint8_t USARTx_IRQn);
 static void USARTx_GPIO(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin_TX,uint16_t GPIO_Pin_RX);
-static void USART_Config(USART_TypeDef* USARTx);
+static void USART_Config(USART_TypeDef* USARTx,uint32_t BaudRate );
 
 void USART_PutChar(char c)
 {
@@ -38,7 +38,7 @@ void USART1_Init(void)
 	USARTx_GPIO(GPIOA,GPIO_Pin_9,GPIO_Pin_10);
 	
 	// Initialization of USARTx
-	USART_Config( USART1);
+	USART_Config( USART1,115200);
 	//Interrup
 	USARTx_NVIC(USART1,USART1_IRQn);//
 	//Enable Interrupt
@@ -58,11 +58,11 @@ static void USARTx_GPIO(GPIO_TypeDef* GPIOx,uint16_t GPIO_Pin_TX,uint16_t GPIO_P
 	GPIO_InitStruct.GPIO_PuPd  = GPIO_PuPd_UP;
 	GPIO_Init(GPIOx, &GPIO_InitStruct);
 }
-static void USART_Config(USART_TypeDef* USARTx)
+static void USART_Config(USART_TypeDef* USARTx,uint32_t BaudRate  )
 {
 	// Initialization of USARTx
 	USART_InitTypeDef USART_InitStruct;
-	USART_InitStruct.USART_BaudRate 						=	9600;
+	USART_InitStruct.USART_BaudRate 						=	BaudRate;
 	USART_InitStruct.USART_HardwareFlowControl  =	USART_HardwareFlowControl_None;
 	USART_InitStruct.USART_Mode 								=	USART_Mode_Rx | USART_Mode_Tx;
 	USART_InitStruct.USART_Parity 							=	USART_Parity_No;
