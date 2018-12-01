@@ -10,8 +10,6 @@ PA6 Channel A
 PA7 channel B
 PA9 TX
 PA10 RX
-
-
 */
 /* Include my libraries here */
 #include "tm_stm32f4_delay.h"
@@ -82,5 +80,3 @@ int main()
 		//quay(PSP_encoder);
 	}
 }
-
-

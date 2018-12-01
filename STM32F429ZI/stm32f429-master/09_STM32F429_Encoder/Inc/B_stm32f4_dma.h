@@ -39,3 +39,4 @@ uint8_t B_USART_DMA_Send(USART_TypeDef* USARTx, uint8_t* DataArray, uint16_t cou
 
 
 #endif
+
