@@ -36,19 +36,55 @@
 #include "B_stm32f4_tim.h"
 #include "stdio.h"
 #include "B_stm32f4_usart.h"
+#include "B_stm32f4_gpio.h"
 #include "pid_controller.h"
 
+
+
 //extern variable
-extern __IO int32_t count_temp1;
+extern __IO int32_t count_temp1,count_temp2,speed;
 extern __IO int32_t RMP,p_encoder,p_encoder_temp,PSP_encoder;
 extern __IO  float PSP;
-extern __IO int32_t count_recent1;
-extern __IO int32_t  count_update1,PSP_Update;
-extern __IO uint16_t duty,Pule;
+extern __IO int32_t count_recent1,count_recent2;
+extern __IO int32_t  count_update1,PSP_Update,count_update2;
+extern __IO uint32_t duty,Pule;
 extern PIDControl pid;
+char data_Buffer3[40];
+char data_Buffer4[40];
+__IO int32_t x,y=0xFFFF;
+int32_t max(int32_t a, int32_t b){
+	return a>b ? a : b;
+}
 
-volatile uint8_t cnt=0;
-
+int32_t min(int32_t a, int32_t b){
+	return a<b ? a : b;
+}
+ void quay(int32_t psp_encoder, int32_t encoder ){
+	 if(encoder < 0xAAAA){
+	 x = max(x,encoder);
+	 }else{
+	 y = min(y,encoder);
+	 }
+	 int32_t A = 0xFFFF-y +x;
+	 int step = A/100;
+	 if(step !=0){
+		 if(encoder > 0xAAAA){
+			speed = 100 -((0xFFFF - encoder) / step);
+		 }
+	 speed = 100-(encoder / step);
+	 }
+	 sprintf(data_Buffer3, "ABC: %d\r\n",speed);//338
+	 B_USART_DMA_Send(USART1, (uint8_t *)data_Buffer3, strlen(data_Buffer3));
+	if(psp_encoder > 0 ){
+		GPIO_ResetBits(GPIOA,GPIO_Pin_14);
+		GPIO_SetBits(GPIOA,GPIO_Pin_12);
+		TIM1->CCR1 = 21 * speed;
+	}else if(psp_encoder < 0 ){
+		GPIO_ResetBits(GPIOA,GPIO_Pin_12);
+		GPIO_SetBits(GPIOA,GPIO_Pin_14);
+		TIM1->CCR1 = 21 * speed;
+	}
+}
 //define he so beta
 #define LPF_Beta 0.25
 __IO int32_t RMP_Update;
@@ -169,75 +205,91 @@ void SysTick_Handler(void)
 }
 
 
-//void TIM3_IRQHandler(void)
-//{
-//	if(TIM_GetFlagStatus(TIM3,TIM_FLAG_Update)==SET)
-//	{
-//		if(TIM3->CR1 & 0x10) // check direction
-//		{
-//			count_temp1 -= 0xFFFF;
-//		}
-//		else
-//		{
-//			count_temp1 += 0xFFFF;
-//		}
-//		TIM_ClearFlag(TIM3,TIM_FLAG_Update);
-//	}
-//	
-//}
+void TIM3_IRQHandler(void)
+{
+	if(TIM_GetFlagStatus(TIM3,TIM_FLAG_Update)==SET)
+	{
+		if(TIM3->CR1 & 0x10) // check direction
+		{
+			count_temp1 -= 0xFFFF;
+		}
+		else
+		{
+			count_temp1 += 0xFFFF;
+		}
+		TIM_ClearFlag(TIM3,TIM_FLAG_Update);
+	}
+	
+}
 
-//void TIM4_IRQHandler(void)
-//{
-
-//}
+void TIM4_IRQHandler(void)
+{
+		if(TIM_GetFlagStatus(TIM4,TIM_FLAG_Update)==SET)
+	{
+		if(TIM4->CR1 & 0x10) // check direction
+		{
+			count_temp2 -= 0xFFFF;
+		}
+		else
+		{
+			count_temp2 += 0xFFFF;
+		}
+		TIM_ClearFlag(TIM4,TIM_FLAG_Update);
+	}
+}
 
 void TIM2_IRQHandler(void)
 {
 	if (TIM_GetFlagStatus(TIM2, TIM_FLAG_Update)==SET)
 	{
-		//count_recent1 = count_temp1 + TIM3->CNT;
-
-		count_recent1 =  TIM3->CNT;
+	
+	//	GPIO_ToggleBits(GPIOG,GPIO_Pin_13);
+		count_recent1 =  count_temp1 + TIM3->CNT;
+	/*number pules of encoder4 */
+		p_encoder = TIM4->CNT;
+				sprintf(data_Buffer4, "E_Right: %d\r\n",PSP_encoder);//338
+				B_USART_DMA_Send(USART1, (uint8_t *)data_Buffer4, strlen(data_Buffer4));
+		
+	//dem xung encoder2
+		count_recent2 = (int32_t)TIM4->CNT;
+		if(count_recent2 > 32767)
+			count_recent2 = 65535-count_recent2;
+		else if(count_recent2 < -32767)
+			count_recent2 += 65535;
+		
 		TIM_ClearFlag(TIM2, TIM_FLAG_Update);
+//		
+		if(p_encoder < 0xAAAA && p_encoder_temp < 0xAAAA){
+			PSP_encoder=(int32_t)(p_encoder - p_encoder_temp);
+		}
+		
+		if(p_encoder > 0xAAAA&& p_encoder_temp > 0xAAAA){
+			PSP_encoder=(int32_t)(p_encoder - p_encoder_temp);
+		}
+//				sprintf(data_Buffer3, " %d\r\n",PSP_encoder);//338
+//	  B_USART_DMA_Send(USART1, (uint8_t *)data_Buffer3, strlen(data_Buffer3));
+		//quay(PSP_encoder);
+		/* compute pule in 10ms*/
 		if(count_recent1 > count_update1)
 		{
-			PSP=(float)((count_recent1-count_update1));
+			PSP=(float)(count_recent1-count_update1);
 		}
 		else if (count_recent1 <= count_update1)
 		{
-			PSP=0.0-(float)((count_recent1-count_update1));
+			PSP = -(float)(count_recent1-count_update1);
 		}
-		
-		//if(cnt>=20){
-//				p_encoder = TIM4->CNT;
-//		if(p_encoder > 0xAAAA && p_encoder_temp > 0xAAAA){
-//			if(p_encoder > p_encoder_temp)
-//				PSP_encoder=(p_encoder - p_encoder_temp);
-//			else if (p_encoder < p_encoder_temp)
-//				PSP_encoder=-(-p_encoder + p_encoder_temp);
-//	}
-//		if(p_encoder < 0xAAAA && p_encoder_temp < 0xAAAA){
-//			if(p_encoder > p_encoder_temp)
-//				PSP_encoder=-(p_encoder - p_encoder_temp);
-//			else if (p_encoder < p_encoder_temp)
-//				PSP_encoder=(-p_encoder + p_encoder_temp);
-	}
-		//cnt =0;
-	//}
-	
-	//}
-	PSP = PSP_Update-LPF_Beta*(PSP_Update-PSP);
+	/*compute PID*/
+	PSP = (float)(PSP_Update-(float)LPF_Beta*(PSP_Update-PSP));
 	PIDInputSet(&pid,PSP);
 	PIDCompute(&pid);
-	duty=PIDOutputGet(&pid);
-	TIM1_PWM(duty);
-	count_update1 = TIM3->CNT;
+	duty=(uint32_t)PIDOutputGet(&pid);
 	
-	
-//	p_encoder_temp = TIM4->CNT;
-	
-	//cnt++;
+		/*PWM*/
+	TIM1->CCR1 = duty;
+	//quay(PSP_encoder);
+	PSP_Update=PSP;
+	count_update1 = count_temp1 + TIM3->CNT;
+	/*update count encoder 2*/
+	p_encoder_temp = TIM4->CNT;
+	}
 }
-
-
-

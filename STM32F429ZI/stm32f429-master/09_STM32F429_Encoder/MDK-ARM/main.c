@@ -5,9 +5,10 @@
 //encoder  encoder2 timer4 counted
 PB6 CH1
 PB7 CH2
-//encoder motor  encoder1 timer 3 
+//encoder motor  encoder1 timer3 
 PA6 Channel A
 PA7 channel B
+
 PA9 TX
 PA10 RX
 */
@@ -22,61 +23,60 @@ PA10 RX
 
 
 //khai bao bien
- __IO int32_t count_temp1;
- __IO int32_t PSP_encoder, p_encoder, p_encoder_temp;
+ __IO int32_t count_temp1,count_temp2=0;
+ __IO int32_t PSP_encoder, p_encoder, p_encoder_temp,count_temp;
  __IO  float PSP=0.0;
- __IO int32_t count_recent1;
- __IO int32_t  count_update1,PSP_Update;
- __IO uint16_t duty,Pule,speed, set_speed;
- PIDControl pid;
+ __IO int32_t count_recent1=0,count_recent2=0;
+ __IO int32_t  count_update1,count_update2;
+ __IO float PSP_Update=0.0;
+ __IO uint32_t duty=0,Pule,speed;
+
  __IO int32_t count_e1=0,count_e2=0;
- void quay(uint32_t psp_encoder){
-	if(psp_encoder > 0){
-		control_PWM1(8399,0);
-	}else{
-		control_PWM1(8399,1);
-	}
-}
  
 /* Create USART working buffer */
 char USART_Buffer[100] = "Hello namb bang to via USART2 with TX DMA\r\n";
 
 int main()
 {
+	
 	SystemInit();
 //  char data_Buffer[50];
-//  char data_Buffer1[50];
-	char data_Buffer2[50]="";
+char data_Buffer1[50];
+	char data_Buffer2[50];
 	//use external clock
 	Clock_HSE();
+	B_GPIO_Init(GPIOG,GPIO_Pin_13,RCC_AHB1Periph_GPIOG,GPIO_Mode_OUT);
 	/* Initialize Encoder */
   encoder1();
 	encoder2();
 	USART1_Init();
-	B_USART_DMA_Init();
-////	
 
-	TIM2_TIME();
+	B_USART_DMA_Init();
+ 	TIM2_TIME();
+	TIM1_INIT();
+	
 	TIM1_PWM(8399);
+	TIM1_PWM();
+
+	PID_Init(20.0,900.0,220.0,90.0);
 	
-	//TIM1_PWM(8399);
-	
-	PIDInit(&pid,0,0,0,0.03,0,8399,AUTOMATIC,DIRECT);
-	set_speed=60;
-	
-	PIDTuningKpSet (&pid,400.0);
-	PIDTuningKiSet (&pid,10.0);//100
-	PIDTuningKdSet (&pid,0.0);//0.09
-	PIDSetpointSet(&pid,set_speed);
 	while (1) {
-		B_USART_DMA_Send(USART1, (uint8_t *)USART_Buffer, strlen(USART_Buffer));
-		sprintf(data_Buffer2, "PSP: %f\r\n",PSP);//338
-	  B_USART_DMA_Send(USART1, (uint8_t *)data_Buffer2, strlen(data_Buffer2));
-		//print PSP
-//		USART_PutString(data_Buffer2);
+	quay(PSP_encoder,TIM4->CNT);
+//		PSP_encoder=0;
+//	sprintf(data_Buffer2, "TIM3: %d\r\n",TIM3->CNT);//338
+//	  B_USART_DMA_Send(USART1, (uint8_t *)data_Buffer2, strlen(data_Buffer2));
+		//USART_PutString(data_Buffer2);
+//		
+//		sprintf(data_Buffer2, " %d\r\n",PSP_encoder);//338
+//	  B_USART_DMA_Send(USART1, (uint8_t *)data_Buffer2, strlen(data_Buffer2));
 		
-//		sprintf(data_Buffer2, "PSP_encoder: %d\r\n",PSP_encoder);//338
-//		USART_PutString(data_Buffer2);
-		//quay(PSP_encoder);
+//		count_temp = (int32_t)TIM4->CNT;
+////		if(count_temp > 32767)
+////			count_temp = 65535-count_temp;
+////		else if(count_temp < -32767)
+////			count_temp += 65535;
+////		
+//		sprintf(data_Buffer1, " count_temp %d\r\n",count_temp);//338
+//	  B_USART_DMA_Send(USART1, (uint8_t *)data_Buffer1, strlen(data_Buffer1));
 	}
 }

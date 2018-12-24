@@ -1,0 +1,8 @@
+
+yêu cau dat ra.(pt khó khăn).
+kho khan trong yeu cau dat ra.
+giải quyết bài toán khó khăn đó.(ước lượng khó khăn,ảnh hưởng)
+yêu cầu -> phân tích-> thiết kế-> hiện thực-> kết quả -> đánh giá kết quả, khó khăn còn tồn tại, định hướng mở rộng-> demo.
+
+- giải thích PID, tầng bước, highlight, (1 slide tối đa 3 màu thông thường).
+

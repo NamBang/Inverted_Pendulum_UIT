@@ -137,7 +137,7 @@ PIDControl;
 //      Nothing.
 // 
 extern void PIDInit(PIDControl *pid, float kp, float ki, float kd, 
-                    float sampleTimeSeconds, float minOutput, float maxOutput, 
+                    float sampleTimeSeconds, uint32_t minOutput, uint32_t maxOutput, 
                     PIDMode mode, PIDDirection controllerDirection);     	
 
 // 
@@ -369,6 +369,7 @@ PIDModeGet(PIDControl *pid) { return pid->mode; }
 inline PIDDirection 
 PIDDirectionGet(PIDControl *pid) { return pid->controllerDirection; }		
 
+void PID_Init(float set_speed, float Kp, float Ki, float Kd );
 
 // 
 // End of C Binding

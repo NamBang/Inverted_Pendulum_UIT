@@ -35,7 +35,10 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx.h"
-
+#include "stm32f4xx_gpio.h"
+#include "stm32f4xx_rcc.h"
+#include "stm32f4xx_flash.h"
+#include "stm32f4xx_usart.h"
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
@@ -51,10 +54,10 @@ void SVC_Handler(void);
 void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
-//void TIM3_IRQHandler(void);
-//void TIM4_IRQHandler(void);
+void TIM3_IRQHandler(void);
+void TIM4_IRQHandler(void);
 void TIM2_IRQHandler(void);
-
+void quay(int32_t psp_encoder, int32_t encoder);
 
 #ifdef __cplusplus
 }

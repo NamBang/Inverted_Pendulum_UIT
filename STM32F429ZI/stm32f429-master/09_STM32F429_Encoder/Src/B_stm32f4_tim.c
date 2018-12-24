@@ -1,12 +1,111 @@
 #include "B_stm32f4_tim.h"
 #include "tm_stm32f4_delay.h"
 #include "B_stm32f4_usart.h"
- TIM_OCInitTypeDef TIM_OCInitStructure;
+
+
+TIM_OCInitTypeDef TIM_OCInitStructure;
+TIM_TimeBaseInitTypeDef 	TIM_TimeBaseInitStructure;
+NVIC_InitTypeDef					NVIC_InitStructure;
+TIM_ICInitTypeDef TIM_ICInitStructure;
+	
 /* Encoder variables */
 __IO int32_t Num_Encoder_1;
+//void TIM1_INIT(void)
+//{
+//	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
+//	/*Enable clock*/
+//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,ENABLE);
+//	RCC_APB1PeriphClockCmd(RCC_AHB1Periph_GPIOA,ENABLE);
+//	 
+//	/*configure PWM Pin out TIM1 CH1-CH1N*/
+//	GPIO_InitTypeDef  GPIO_InitStructure;
+//  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 ;
+//  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+//  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+//  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+//  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+//  GPIO_Init(GPIOA, &GPIO_InitStructure); 
+// 
+//	GPIO_PinAFConfig(GPIOA, GPIO_PinSource8, GPIO_AF_TIM1); 
+//	// Create 1kHz PWM
+//	// TIM4 is connected to APB1 bus that have default clock 84MHz
+//	// So, the frequency of TIM4 is 84MHz
+//	// We use prescaler 10 here
+//	// So, the frequency of TIM4 now is 8.4MHz
+//	// TIM_Period determine the PWM frequency by this equation:
+//	// PWM_frequency = timer_clock / (TIM_Period + 1)
+//	// If we want 1kHz PWM we can calculate:
+//	// TIM_Period = (timer_clock / PWM_frequency) - 1
+//	// TIM_Period = (8.4MHz / 1kHz) - 1 = 8399
+//	
+//	/*configure Freqency for PWM by: 84MHZ/(Period+1)/(Prescaler+1)*/
+//	TIM_TimeBaseInitStructure.TIM_Prescaler= 9;
+//	TIM_TimeBaseInitStructure.TIM_Period =8399;// gia tri cua thanh ghi ARR dem de duoc tan so pwm là môt khz 
+//	TIM_TimeBaseInitStructure.TIM_CounterMode=TIM_CounterMode_Up;
+//	TIM_TimeBaseInitStructure.TIM_ClockDivision=0x0;
+//	TIM_TimeBaseInitStructure.TIM_RepetitionCounter=0;
+//	TIM_TimeBaseInit(TIM1,&TIM_TimeBaseInitStructure);
+//	//Preloadconfig toan bo timer
+//	TIM_ARRPreloadConfig(TIM1, ENABLE);
+//	/* Main Output Enable */
+//  TIM_CtrlPWMOutputs(TIM1, ENABLE);
+//	/*Enable PWM_TIM*/
+//	TIM_Cmd(TIM1, ENABLE);
+
+//	
+//}
+
+//void TIM1_PWM(__IO uint32_t Pulse )
+//{
+//	
+//	/*Configure PWM*/
+//	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;//choose mode pwm1 oc: output compare
+//	/*Chon muc cao cho dau ra, neu chon muc thap thi no se bi dao nguoc hinh dang dau ra, chu ky tan so deu nhu nhau*/
+//	TIM_OCInitStructure.TIM_OutputState	=	TIM_OutputState_Enable;
+//	TIM_OCInitStructure.TIM_OCPolarity	=	TIM_OCPolarity_High;
+//	// Duty cycle calculation equation:
+//	// TIM_Pulse = (((TIM_Period + 1) * duty_cycle) / 100) - 1
+//	// Ex. 25% duty cycle:
+//	// TIM_Pulse = (((8399 + 1) * 25) / 100) - 1 = 2099// gia tri thanh ghi ARR dem tu 0-2099 pwm muc cao va tu 2099 - 8399 PWM muc thap 
+//	// TIM_Pulse = (((8399 + 1) * 75) / 100) - 1 = 6299
+//	TIM_OCInitStructure.TIM_Pulse=Pulse;
+//	TIM_OCInitStructure.TIM_OCIdleState	=	TIM_OCIdleState_Reset;
+//	
+//	/*PWM Channel 1*/
+//	TIM_OC1Init(TIM1, &TIM_OCInitStructure);
+//	//Enables or disables the TIMx peripheral Preload register on CCR1.
+//	TIM_OC1PreloadConfig(TIM1,TIM_OCPreload_Enable); 
+//	//Selects the TIM Output Compare Mode
+//  TIM_SelectOCxM(TIM1, TIM_Channel_1, TIM_OCMode_PWM1);
+//	//Enables or disables the TIM Capture Compare Channel x
+//  TIM_CCxCmd(TIM1, TIM_Channel_1, TIM_CCx_Enable);
+//	
+
+//	//Enables or disables TIMx peripheral Preload register on ARR
+//	TIM_ARRPreloadConfig(TIM1, ENABLE);//preloadconfig all timer
+//	////Enable clock for GPOI
+//	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+//	//Initialize struct
+//	GPIO_InitTypeDef GPIO_InitDef;
+//	//Pins 12 and 14
+//	GPIO_InitDef.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_14;
+//	//Mode output
+//	GPIO_InitDef.GPIO_Mode = GPIO_Mode_OUT;
+//	//Output type push-pull
+//	GPIO_InitDef.GPIO_OType = GPIO_OType_PP;
+//	//Without pull resistors
+//	GPIO_InitDef.GPIO_PuPd = GPIO_PuPd_NOPULL;
+//	//50MHz pin speed
+//	GPIO_InitDef.GPIO_Speed = GPIO_Speed_50MHz;
+//	 GPIO_Init(GPIOA, &GPIO_InitDef);
+//	//Initialize pins on GPIOG port
+//	GPIO_ResetBits(GPIOA,GPIO_Pin_12);
+//	GPIO_SetBits(GPIOA,GPIO_Pin_14);
+
+//}
+
 void TIM1_INIT(void)
 {
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
 	/*Enable clock*/
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1,ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_AHB1Periph_GPIOA,ENABLE);
@@ -19,8 +118,11 @@ void TIM1_INIT(void)
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
   GPIO_Init(GPIOA, &GPIO_InitStructure); 
- 
+  
+//  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9 ;
+//  GPIO_Init(GPIOA, &GPIO_InitStructure);
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource8, GPIO_AF_TIM1); 
+ // GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_TIM1);
 	// Create 1kHz PWM
 	// TIM4 is connected to APB1 bus that have default clock 84MHz
 	// So, the frequency of TIM4 is 84MHz
@@ -31,57 +133,50 @@ void TIM1_INIT(void)
 	// If we want 1kHz PWM we can calculate:
 	// TIM_Period = (timer_clock / PWM_frequency) - 1
 	// TIM_Period = (8.4MHz / 1kHz) - 1 = 8399
-	
 	/*configure Freqency for PWM by: 84MHZ/(Period+1)/(Prescaler+1)*/
 	TIM_TimeBaseInitStructure.TIM_Prescaler= 9;
 	TIM_TimeBaseInitStructure.TIM_Period =8399;// gia tri cua thanh ghi ARR dem de duoc tan so pwm là môt khz 
 	TIM_TimeBaseInitStructure.TIM_CounterMode=TIM_CounterMode_Up;
 	TIM_TimeBaseInitStructure.TIM_ClockDivision=0x0;
 	TIM_TimeBaseInitStructure.TIM_RepetitionCounter=0;
+	
 	TIM_TimeBaseInit(TIM1,&TIM_TimeBaseInitStructure);
-	//Preloadconfig toan bo timer
-	TIM_ARRPreloadConfig(TIM1, ENABLE);
 	/*Enable PWM_TIM*/
   TIM_Cmd(TIM1, ENABLE);
 	/* Main Output Enable */
   TIM_CtrlPWMOutputs(TIM1, ENABLE);
 	
+	
 }
-
-void TIM1_PWM(__IO uint32_t Pulse )
-{
-	
-	
+//void TIM1_PWM(__IO uint32_t Pulse )
+void TIM1_PWM( )
+{	
 	/*Configure PWM*/
- 
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;//choose mode pwm1 oc: output compare
+  TIM_OCInitTypeDef TIM_OCInitStructure;
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;//chon mode pwm1 oc: output compare
 	/*Chon muc cao cho dau ra, neu chon muc thap thi no se bi dao nguoc hinh dang dau ra, chu ky tan so deu nhu nhau*/
-	TIM_OCInitStructure.TIM_OutputState	=	TIM_OutputState_Enable;
-	TIM_OCInitStructure.TIM_OCPolarity	=	TIM_OCPolarity_High;
+	TIM_OCInitStructure.TIM_OutputState=TIM_OutputState_Enable;
+	TIM_OCInitStructure.TIM_OCPolarity=TIM_OCPolarity_High;
+
+	
 	// Duty cycle calculation equation:
 	// TIM_Pulse = (((TIM_Period + 1) * duty_cycle) / 100) - 1
 	// Ex. 25% duty cycle:
 	// TIM_Pulse = (((8399 + 1) * 25) / 100) - 1 = 2099// gia tri thanh ghi ARR dem tu 0-2099 pwm muc cao va tu 2099 - 8399 PWM muc thap 
 	// TIM_Pulse = (((8399 + 1) * 75) / 100) - 1 = 6299
-	TIM_OCInitStructure.TIM_Pulse=Pulse;
-	TIM_OCInitStructure.TIM_OCIdleState	=	TIM_OCIdleState_Reset;
-	
+//	TIM_OCInitStructure.TIM_Pulse=Pulse;
+	TIM_OCInitStructure.TIM_Pulse=8399;
+	TIM_OCInitStructure.TIM_OCIdleState=TIM_OCIdleState_Reset;
 	/*PWM Channel 1*/
-	TIM_OC1Init(TIM1, &TIM_OCInitStructure);
-	//Enables or disables the TIMx peripheral Preload register on CCR1.
-	TIM_OC1PreloadConfig(TIM1,TIM_OCPreload_Enable); 
-	//Selects the TIM Output Compare Mode
+	TIM_OC1Init(TIM1, &TIM_OCInitStructure);//cho phep channel 2 active
+	TIM_OC1PreloadConfig(TIM1,TIM_OCPreload_Enable);
   TIM_SelectOCxM(TIM1, TIM_Channel_1, TIM_OCMode_PWM1);
-	//Enables or disables the TIM Capture Compare Channel x
   TIM_CCxCmd(TIM1, TIM_Channel_1, TIM_CCx_Enable);
-
-	//Enables or disables TIMx peripheral Preload register on ARR
-	TIM_ARRPreloadConfig(TIM1, ENABLE);//preloadconfig all timer
-	////Enable clock for GPOI
-	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+	
+	TIM_ARRPreloadConfig(TIM1, ENABLE);//preloadconfig toan bo timer
+	
 	//Initialize struct
 	GPIO_InitTypeDef GPIO_InitDef;
-	 
 	//Pins 12 and 14
 	GPIO_InitDef.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_14;
 	//Mode output
@@ -95,28 +190,15 @@ void TIM1_PWM(__IO uint32_t Pulse )
 	 GPIO_Init(GPIOA, &GPIO_InitDef);
 	//Initialize pins on GPIOG port
 	GPIO_ResetBits(GPIOA,GPIO_Pin_12);
-		GPIO_SetBits(GPIOA,GPIO_Pin_14);
+	GPIO_SetBits(GPIOA,GPIO_Pin_14);
 
-}
+	
 
-void control_PWM1(__IO uint32_t Pulse,__IO uint8_t chieu ){
-	TIM_OCInitStructure.TIM_Pulse=Pulse;
-	if(chieu==1){
-		GPIO_ResetBits(GPIOA,GPIO_Pin_12);
-		GPIO_SetBits(GPIOA,GPIO_Pin_14);
-	}else{
-		GPIO_ResetBits(GPIOA,GPIO_Pin_14);
-		GPIO_SetBits(GPIOA,GPIO_Pin_12);
-	}
 }
 
 //use timer 3 count pulse 
 void encoder1(void)
 {
-	
-	TIM_ICInitTypeDef TIM_ICInitStructure;
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
-//	NVIC_InitTypeDef					NVIC_InitStructure;
 	
 	//enable colck for timers
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3,ENABLE);
@@ -146,22 +228,21 @@ void encoder1(void)
 	/*Reset Counter 1*/
 	TIM_SetCounter(TIM3, 0);	
 	
-//	/*Clear Interrupt Update flag 1*/
-//	TIM_ClearFlag(TIM3, TIM_FLAG_Update);
-//	
-//	/*Enable Update Interrupt of 2ng TIMER*/
-//	TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
-//	
-//	/* 2 bit for pre-emption priority, 2 bits for subpriority */
-//	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);
-//	
-//	/*Configure NVIC for Encoder Interface Update Interrupt 1*/
-//	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=3;
-//	NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
-//	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE ;
-//	NVIC_Init(&NVIC_InitStructure);
-//	Num_Encoder_1=0;
+	/*Clear Interrupt Update flag 1*/
+	TIM_ClearFlag(TIM3, TIM_FLAG_Update);
+	
+	/*Enable Update Interrupt of 2ng TIMER*/
+	TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);
+	
+	/* 2 bit for pre-emption priority, 2 bits for subpriority */
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+	
+	/*Configure NVIC for Encoder Interface Update Interrupt 1*/
+	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=2;
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE ;
+	NVIC_Init(&NVIC_InitStructure);
 	
 	/*Enable 1nd Timer */
 	TIM_Cmd(TIM3,ENABLE);	
@@ -170,10 +251,6 @@ void encoder1(void)
 //use timer4 counted
 void encoder2()
 {
-	TIM_ICInitTypeDef 				TIM_ICInitStructure;
-	TIM_TimeBaseInitTypeDef   TIM_TimeBaseInitStructure;
-//NVIC_InitTypeDef					NVIC_InitStructure;
-	
 	//enable colck for timers
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4,ENABLE);
 	//khoi tao phin noi 
@@ -204,20 +281,19 @@ void encoder2()
 	
 //	/*Clear Interrupt Update flag 1*/
 //	TIM_ClearFlag(TIM4, TIM_FLAG_Update);
-	
+//	
 //	/*Enable Update Interrupt of 2ng TIMER*/
 //	TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE);
 //	
 //	/* 2 bit for pre-emption priority, 2 bits for subpriority */
-//	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+//	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_3);
 //	
 //	/*Configure NVIC for Encoder Interface Update Interrupt 1*/
-//	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=2;
+//	NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;
+//	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=3;
 //	NVIC_InitStructure.NVIC_IRQChannelSubPriority=0;
 //	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE ;
 //	NVIC_Init(&NVIC_InitStructure);
-//	Num_Encoder_1=0;
 	
 	/*Enable 1nd Timer */
 	TIM_Cmd(TIM4,ENABLE);	
@@ -229,12 +305,9 @@ void encoder2()
 void TIM2_TIME(void)
 {
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2 , ENABLE);
-  TIM_TimeBaseInitTypeDef 	TIM_TimeBaseInitStructure;
-	NVIC_InitTypeDef					NVIC_InitStructure;
-	
-	// TIM4 configuration 
-	TIM_TimeBaseInitStructure.TIM_Period = 399; // delay 100ms/999  300ms/9     
-	TIM_TimeBaseInitStructure.TIM_Prescaler= (8399);	 //10khz// do no dem tu 0
+	// TIM2 configuration 
+	TIM_TimeBaseInitStructure.TIM_Period = 83; // delay 100ms/999  300ms/9     
+	TIM_TimeBaseInitStructure.TIM_Prescaler= 0;	 //10khz// do no dem tu 0
 	TIM_TimeBaseInitStructure.TIM_ClockDivision = 0x0;    
 	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;  
 	TIM_TimeBaseInit(TIM2,&TIM_TimeBaseInitStructure);
@@ -248,15 +321,25 @@ void TIM2_TIME(void)
 	/* 2 bit for pre-emption priority, 2 bits for subpriority */
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
 	
-	// Enable the TIM4 global Interrupt 
+	// Enable the TIM2 global Interrupt 
   NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 	
-	//TIM enable counter 
+	//TIM2 enable counter 
 	TIM_Cmd(TIM2, ENABLE);	
 	
 }
 
+
+void control_PWM1(__IO uint8_t Dir ){
+	if(Dir==0){
+		GPIO_ResetBits(GPIOA,GPIO_Pin_12);
+		GPIO_SetBits(GPIOA,GPIO_Pin_14);
+	}else{
+		GPIO_ResetBits(GPIOA,GPIO_Pin_14);
+		GPIO_SetBits(GPIOA,GPIO_Pin_12);
+	}
+}

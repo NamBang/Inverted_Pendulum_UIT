@@ -467,14 +467,14 @@
               <FilePath>..\..\..\Stm32F429 library\My_Library\src\B_stm32f4_gpio.c</FilePath>
             </File>
             <File>
-              <FileName>B_stm32f4_usart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\Stm32F429 library\My_Library\src\B_stm32f4_usart.c</FilePath>
-            </File>
-            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\main.c</FilePath>
+            </File>
+            <File>
+              <FileName>B_stm32f4_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\Stm32F429 library\My_Library\src\B_stm32f4_usart.c</FilePath>
             </File>
             <File>
               <FileName>tm_stm32f4_delay.c</FileName>

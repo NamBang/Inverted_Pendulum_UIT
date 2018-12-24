@@ -53,5 +53,6 @@
 .\objects\stm32f4xx_it.o: ..\..\..\Stm32F429 library\My_Library\inc\B_stm32f4_gpio.h
 .\objects\stm32f4xx_it.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\stm32f4xx_it.o: ..\..\..\Stm32F429 library\My_Library\inc\B_stm32f4_usart.h
+.\objects\stm32f4xx_it.o: ..\..\..\Stm32F429 library\My_Library\inc\B_stm32f4_gpio.h
 .\objects\stm32f4xx_it.o: ..\Inc\pid_controller.h
 .\objects\stm32f4xx_it.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdbool.h

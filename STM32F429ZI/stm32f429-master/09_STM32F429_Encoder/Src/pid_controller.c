@@ -10,11 +10,21 @@
 //*********************************************************************************
 #define CONSTRAIN(x,lower,upper)    ((x)<(lower)?(lower):((x)>(upper)?(upper):(x)))
 
+/* variable*/
+ PIDControl pid;
 //*********************************************************************************
 // Functions
 //*********************************************************************************
+void PID_Init(float set_speed, float Kp, float Ki, float Kd )
+{
+	PIDInit(&pid,0.0,0.0,0.0,0.01,0,8399,AUTOMATIC,DIRECT);
+	PIDTuningKpSet (&pid,Kp);
+	PIDTuningKiSet (&pid,Ki);//100
+	PIDTuningKdSet (&pid,Kd);//0.09
+	PIDSetpointSet(&pid,set_speed);
+}
 void PIDInit(PIDControl *pid, float kp, float ki, float kd, 
-             float sampleTimeSeconds, float minOutput, float maxOutput, 
+             float sampleTimeSeconds, uint32_t minOutput, uint32_t maxOutput, 
              PIDMode mode, PIDDirection controllerDirection)     	
 {
     pid->controllerDirection = controllerDirection;
