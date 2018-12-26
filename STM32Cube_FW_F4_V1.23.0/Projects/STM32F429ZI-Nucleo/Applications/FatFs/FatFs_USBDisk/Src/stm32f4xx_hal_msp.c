@@ -1,39 +1,30 @@
-
-
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 extern DMA_HandleTypeDef hdma_usart1_tx;
-
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* External functions --------------------------------------------------------*/
-/* USER CODE BEGIN ExternalFunctions */
+/* BEGIN ExternalFunctions */
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim);
 
-/* USER CODE END ExternalFunctions */
-
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
 /**
   * Initializes the Global MSP.
   */
 void HAL_MspInit(void)
 {
-  /* USER CODE BEGIN MspInit 0 */
+  /* BEGIN MspInit 0 */
 
-  /* USER CODE END MspInit 0 */
+
 
   __HAL_RCC_SYSCFG_CLK_ENABLE();
   __HAL_RCC_PWR_CLK_ENABLE();
 
   /* System interrupt init*/
 
-  /* USER CODE BEGIN MspInit 1 */
 
-  /* USER CODE END MspInit 1 */
 }
 
 /**
@@ -47,14 +38,42 @@ void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 
   if(htim_base->Instance==TIM2)
   {
-  /* USER CODE BEGIN TIM2_MspInit 0 */
+  /* BEGIN TIM2_MspInit 0 */
 
-  /* USER CODE END TIM2_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_TIM2_CLK_ENABLE();
-  /* USER CODE BEGIN TIM2_MspInit 1 */
+ 
 
-  /* USER CODE END TIM2_MspInit 1 */
+
+	}
+	if(htim_base->Instance==TIM1)
+  {
+
+    /* Peripheral clock enable */
+    __HAL_RCC_TIM1_CLK_ENABLE();
+
+  }
+
+}
+
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef* htim)
+{
+
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+  if(htim->Instance==TIM1)
+  {
+  /*  BEGIN TIM1_MspPostInit 0 */
+  
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    /**TIM1 GPIO Configuration    
+    PA8     ------> TIM1_CH1 
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_8;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
   }
 
 }
@@ -70,20 +89,24 @@ void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef* htim_base)
 {
 
   if(htim_base->Instance==TIM2)
-  {
-  /* USER CODE BEGIN TIM2_MspDeInit 0 */
+	{
 
-  /* USER CODE END TIM2_MspDeInit 0 */
+  /* USER CODE END TIM1_MspDeInit 0 */
+
     /* Peripheral clock disable */
     __HAL_RCC_TIM2_CLK_DISABLE();
 
     /* TIM2 interrupt DeInit */
     HAL_NVIC_DisableIRQ(TIM2_IRQn);
-  /* USER CODE BEGIN TIM2_MspDeInit 1 */
 
-  /* USER CODE END TIM2_MspDeInit 1 */
   }
 
+		
+  if(htim_base->Instance==TIM1)
+	{
+		    /* Peripheral clock disable */
+    __HAL_RCC_TIM1_CLK_DISABLE();
+	}
 }
 
 
@@ -99,9 +122,9 @@ void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef* htim_encoder)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(htim_encoder->Instance==TIM3)
   {
-  /* USER CODE BEGIN TIM3_MspInit 0 */
+  /*  BEGIN TIM3_MspInit 0 */
 
-  /* USER CODE END TIM3_MspInit 0 */
+
     /* Peripheral clock enable */
     __HAL_RCC_TIM3_CLK_ENABLE();
   
@@ -126,9 +149,9 @@ void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef* htim_encoder)
   }
   else if(htim_encoder->Instance==TIM4)
   {
-  /* USER CODE BEGIN TIM4_MspInit 0 */
+  /*  BEGIN TIM4_MspInit 0 */
 
-  /* USER CODE END TIM4_MspInit 0 */
+
     /* Peripheral clock enable */
     __HAL_RCC_TIM4_CLK_ENABLE();
   
@@ -159,9 +182,9 @@ void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef* htim_encoder)
 
   if(htim_encoder->Instance==TIM3)
   {
-  /* USER CODE BEGIN TIM3_MspDeInit 0 */
+  /* BEGIN TIM3_MspDeInit 0 */
 
-  /* USER CODE END TIM3_MspDeInit 0 */
+
     /* Peripheral clock disable */
     __HAL_RCC_TIM3_CLK_DISABLE();
   
@@ -179,9 +202,8 @@ void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef* htim_encoder)
   }
   else if(htim_encoder->Instance==TIM4)
   {
-  /* USER CODE BEGIN TIM4_MspDeInit 0 */
+  /* BEGIN TIM4_MspDeInit 0 */
 
-  /* USER CODE END TIM4_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_TIM4_CLK_DISABLE();
   
@@ -193,9 +215,7 @@ void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef* htim_encoder)
 
     /* TIM4 interrupt DeInit */
     HAL_NVIC_DisableIRQ(TIM4_IRQn);
-  /* USER CODE BEGIN TIM4_MspDeInit 1 */
 
-  /* USER CODE END TIM4_MspDeInit 1 */
   }
 
 }
@@ -212,9 +232,9 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(huart->Instance==USART1)
   {
-  /* USER CODE BEGIN USART1_MspInit 0 */
+  /*BEGIN USART1_MspInit 0 */
 
-  /* USER CODE END USART1_MspInit 0 */
+
     /* Peripheral clock enable */
     __HAL_RCC_USART1_CLK_ENABLE();
   
@@ -252,9 +272,7 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     /* USART1 interrupt Init */
     HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(USART1_IRQn);
-  /* USER CODE BEGIN USART1_MspInit 1 */
 
-  /* USER CODE END USART1_MspInit 1 */
   }
 
 }
@@ -271,9 +289,9 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
 
   if(huart->Instance==USART1)
   {
-  /* USER CODE BEGIN USART1_MspDeInit 0 */
+  /*  BEGIN USART1_MspDeInit 0 */
 
-  /* USER CODE END USART1_MspDeInit 0 */
+
     /* Peripheral clock disable */
     __HAL_RCC_USART1_CLK_DISABLE();
   
@@ -288,15 +306,12 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
 
     /* USART1 interrupt DeInit */
     HAL_NVIC_DisableIRQ(USART1_IRQn);
-  /* USER CODE BEGIN USART1_MspDeInit 1 */
 
-  /* USER CODE END USART1_MspDeInit 1 */
+
   }
 
 }
 
-/* USER CODE BEGIN 1 */
 
-/* USER CODE END 1 */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -3,6 +3,7 @@
 "stm32f429zi_nucleo\exe\usbh_conf.o"
 "stm32f429zi_nucleo\exe\main.o"
 "stm32f429zi_nucleo\exe\stm32f4xx_hal_msp.o"
+"stm32f429zi_nucleo\exe\pid_controller.o"
 "stm32f429zi_nucleo\exe\startup_stm32f429xx.o"
 "stm32f429zi_nucleo\exe\stm32f4xx_nucleo_144.o"
 "stm32f429zi_nucleo\exe\usbh_pipes.o"
