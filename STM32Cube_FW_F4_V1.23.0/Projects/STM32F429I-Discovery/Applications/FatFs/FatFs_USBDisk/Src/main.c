@@ -1,0 +1,211 @@
+/* Includes ------------------------------------------------------------------*/
+#include "stm32f4xx_it.h"
+#include <stdio.h>
+#include "string.h"
+#include "pid_controller.h"
+#include "main.h"
+#include "uart.h"
+#include "timer.h"
+#include "gpio.h"
+#include "usb.h"
+
+#define LPF_Beta 0.25
+/* Private typedef -----------------------------------------------------------*/
+/* Private define ------------------------------------------------------------*/
+/* Private macro -------------------------------------------------------------*/
+/* Private variables ---------------------------------------------------------*/
+extern PIDControl pid;
+extern TIM_HandleTypeDef htim2;
+extern TIM_HandleTypeDef htim3;
+extern TIM_HandleTypeDef htim4;
+extern TIM_HandleTypeDef htim1;
+extern DMA_HandleTypeDef hdma_usart1_tx;
+extern UART_HandleTypeDef huart1;
+extern char USBDISKPath[4];
+extern USBH_HandleTypeDef hUSBHost;
+extern MSC_ApplicationTypeDef Appli_state;
+
+char buffer1[20],buffer2[20];
+char start_program[]= "Start program";
+char Start_Write_USB[]="Start write USB";
+char Close_USB[] = "Close_USB";
+uint32_t count1,count2,temp,count_time=0;
+__IO bool flag=FALSE;
+uint32_t duty=8399;
+
+/*khao bao bien*/
+__IO int32_t count_recent1=0,count_update1=0;
+__IO  float PSP=0.0;
+__IO float PSP_Update=0.0;
+
+/**
+  * @brief  Main program
+  * @param  None
+  * @retval None
+  */
+int main(void)
+{
+		HAL_UART_Transmit_IT(&huart1,(uint8_t *)start_program,strlen(start_program));
+    HAL_Init();
+    /* Configure LED3 and LED4 */
+    BSP_LED_Init(LED3);
+    BSP_LED_Init(LED4);
+    /* Configure the system clock to 168 MHz */
+    SystemClock_Config();
+    /* Initialize all configured peripherals */
+    B_GPIO_Init();
+    B_TIM3_Init();
+    B_TIM4_Init();
+    B_USART1_UART_Init();
+    B_DMA_Init();
+    B_TIM2_Init();
+    /* Initialize interrupts */
+    B_NVIC_Init_Tim2();
+    B_TIM1_Init();
+    HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
+    HAL_TIM_Encoder_Start(&htim3,TIM_CHANNEL_ALL);
+    HAL_TIM_Encoder_Start(&htim4,TIM_CHANNEL_ALL);
+    HAL_TIM_Base_Start_IT(&htim2);
+    TIM1->CCR1 = 8399;
+////	PID_Init(20.0,900.0,220.0,90.0);
+    PID_Init(10.0,900.0,220.0,90.0);
+    /*##-1- Link the USB Host disk I/O driver ##################################*/
+//    if(FATFS_LinkDriver(&USBH_Driver, USBDISKPath) == 0)
+//    {
+//					HAL_UART_Transmit_IT(&huart1,(uint8_t *)Start_Read_USB,strlen(Start_Read_USB));
+//        /*##-2- Init Host Library ################################################*/
+//        USBH_Init(&hUSBHost, USBH_UserProcess, 0);
+//        /*##-3- Add Supported Class ##############################################*/
+//        USBH_RegisterClass(&hUSBHost, USBH_MSC_CLASS);
+//        /*##-4- Start Host Process ###############################################*/
+//        USBH_Start(&hUSBHost);
+//        /*##-5- Run Application (Blocking mode) ##################################*/
+//        while (1)
+//        {
+//            /* USB Host Background task */
+//            USBH_Process(&hUSBHost);
+//            //	MSC_Application();
+//            /* Mass Storage Application State Machine */
+//            switch(Appli_state)
+//            {
+//            case APPLICATION_START:
+//                MSC_Application();
+//                Appli_state = APPLICATION_IDLE;
+//                break;
+
+//            case APPLICATION_IDLE:
+//            default:
+//                break;
+//            }
+//            count1 = TIM3->CNT;
+//            sprintf(buffer1,"%d\r\n",count1);
+
+////			count1 = PSP;
+//			sprintf(buffer1,"%f;%d\r\n",PSP,count_time);
+//			HAL_UART_Transmit_IT(&huart1,(uint8_t *)buffer1,strlen(buffer1));
+//        }
+//    }
+		
+		while(1)
+		{
+           sprintf(buffer1,"%f;%d\r\n",PSP,count_time);
+//			count1 = PSP;
+//			sprintf(buffer1,"count1 : %d\r\n",count1);
+            HAL_UART_Transmit_IT(&huart1,(uint8_t *)buffer1,strlen(buffer1));
+		}
+		
+		
+
+}
+
+/* function user define*/
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if(htim->Instance == htim2.Instance)
+    {
+        //BSP_LED_Toggle(LED4);
+			count_recent1 = temp+TIM3->CNT;
+			if(count_recent1 > count_update1)
+			{
+				PSP=(float)(count_recent1-count_update1);
+			}
+			else if (count_recent1 <= count_update1)
+			{
+				PSP = -(float)(count_recent1-count_update1);
+			}
+		/*compute PID*/
+		PSP = (float)(PSP_Update-(float)LPF_Beta*(PSP_Update-PSP));//lowpass filter
+
+		PIDInputSet(&pid,PSP);
+		PIDCompute(&pid);
+		duty=(uint32_t)PIDOutputGet(&pid);
+			/*PWM*/
+		TIM1->CCR1 = duty;
+		PSP_Update=PSP;
+		count_update1 =  temp+TIM3->CNT;
+		count_time++;
+        //HAL_GPIO_TogglePin(GPIOG,GPIO_PIN_13);
+//		__HAL_TIM_CLEAR_IT(&htim2, TIM_IT_UPDATE);
+    }
+    if(htim->Instance == htim3.Instance)
+    {
+			if(TIM3->CR1 & 0x10) // check direction
+			{
+				temp -= 0xFFFF;
+			}
+			else
+			{
+				temp += 0xFFFF;
+			}
+        //HAL_GPIO_TogglePin(GPIOG,GPIO_PIN_13);
+//		__HAL_TIM_CLEAR_IT(&htim2, TIM_IT_UPDATE);
+    }
+    if(htim->Instance == htim4.Instance)
+    {
+        //HAL_GPIO_TogglePin(GPIOG,GPIO_PIN_13);
+//		__HAL_TIM_CLEAR_IT(&htim2, TIM_IT_UPDATE);
+    }
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	flag = !flag;
+	BSP_LED_Toggle(LED3);
+	/*doi khi nao nha nut*/
+	while(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_0));
+	
+}
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @param  None
+  * @retval None
+  */
+void Error_Handler(void)
+{
+    /* Turn LED4 on */
+    BSP_LED_On(LED4);
+
+}
+
+#ifdef  USE_FULL_ASSERT
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t* file, uint32_t line)
+{
+    /* User can add his own implementation to report the file name and line number,
+       ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+
+    /* Infinite loop */
+    while (1)
+    {
+    }
+}
+#endif
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
