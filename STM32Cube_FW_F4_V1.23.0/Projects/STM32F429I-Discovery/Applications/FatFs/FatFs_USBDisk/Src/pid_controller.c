@@ -11,17 +11,16 @@
 #define CONSTRAIN(x,lower,upper)    ((x)<(lower)?(lower):((x)>(upper)?(upper):(x)))
 
 /* variable*/
-PIDControl pid;
+
 //*********************************************************************************
 // Functions
 //*********************************************************************************
-void PID_Init(float set_speed, float Kp, float Ki, float Kd )
+void PID_Init(PIDControl *pid,float set_speed, float Kp, float Ki, float Kd )
 {
-    PIDInit(&pid,0.0,0.0,0.0,0.01,0,8399,AUTOMATIC,DIRECT);
-    PIDTuningKpSet (&pid,Kp);
-    PIDTuningKiSet (&pid,Ki);//100
-    PIDTuningKdSet (&pid,Kd);//0.09
-    PIDSetpointSet(&pid,set_speed);
+    PIDTuningKpSet (pid,Kp);
+    PIDTuningKiSet (pid,Ki);//100
+    PIDTuningKdSet (pid,Kd);//0.09
+    PIDSetpointSet(pid,set_speed);
 }
 void PIDInit(PIDControl *pid, float kp, float ki, float kd,
              float sampleTimeSeconds, uint32_t minOutput, uint32_t maxOutput,
@@ -34,7 +33,7 @@ void PIDInit(PIDControl *pid, float kp, float ki, float kd,
     pid->lastInput = 0.0f;
     pid->output = 0.0f;
     pid->setpoint = 0.0f;
-
+		pid->error = 0.0f;
     if(sampleTimeSeconds > 0.0f)
     {
         pid->sampleTime = sampleTimeSeconds;
@@ -64,22 +63,21 @@ PIDCompute(PIDControl *pid)
 
     // The classic PID error term
     error = (pid->setpoint) - (pid->input);
-
+		//pid->error +=error;
     // Compute the integral term separately ahead of time
-    pid->iTerm += (pid->alteredKi) * error;
+    pid->iTerm += (pid->alteredKi) * error; //220*2
 
     // Constrain the integrator to make sure it does not exceed output bounds
     pid->iTerm = CONSTRAIN( (pid->iTerm), (pid->outMin), (pid->outMax) );
 
     // Take the "derivative on measurement" instead of "derivative on error"
-    dInput = (pid->input) - (pid->lastInput);
+    dInput = (pid->input) - (pid->lastInput); //12
 
     // Run all the terms together to get the overall output
-    pid->output = (pid->alteredKp) * error + (pid->iTerm) - (pid->alteredKd) * dInput;
+    pid->output = (pid->alteredKp) * error + (pid->iTerm) - (pid->alteredKd) * dInput; 
 
     // Bound the output
     pid->output = CONSTRAIN( (pid->output), (pid->outMin), (pid->outMax) );
-
     // Make the current input the former input
     pid->lastInput = pid->input;
 //    sprintf(data_Buffer3, "erro: %0.3f\r\n", (float)(error));

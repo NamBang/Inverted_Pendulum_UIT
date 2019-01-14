@@ -43,7 +43,7 @@ void MSC_Application(void)
             }
 					}
             /* Close the open text file */
-						HAL_UART_Transmit_IT(&huart1,(uint8_t *)Close_USB,strlen(Close_USB));
+						//HAL_UART_Transmit_IT(&huart1,(uint8_t *)Close_USB,strlen(Close_USB));
             f_close(&MyFile);
 
         }

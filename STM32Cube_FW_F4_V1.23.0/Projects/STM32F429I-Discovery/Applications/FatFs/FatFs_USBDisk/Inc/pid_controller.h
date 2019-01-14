@@ -52,7 +52,7 @@ typedef struct
     // Output of the PID Controller
     //
     float output;
-
+		float error;
     //
     // Gain constant values that were passed by the user
     // These are for display purposes
@@ -393,7 +393,7 @@ PIDDirectionGet(PIDControl *pid)
     return pid->controllerDirection;
 }
 
-void PID_Init(float set_speed, float Kp, float Ki, float Kd );
+void PID_Init(PIDControl *pid, float set_speed, float Kp, float Ki, float Kd );
 
 //
 // End of C Binding
