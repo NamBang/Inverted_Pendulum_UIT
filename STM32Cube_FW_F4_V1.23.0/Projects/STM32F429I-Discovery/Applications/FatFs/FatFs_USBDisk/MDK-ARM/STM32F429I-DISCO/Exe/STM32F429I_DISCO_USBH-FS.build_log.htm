@@ -27,7 +27,19 @@ Project File Date:  12/27/2018
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'STM32F429I-DISCO'
-"STM32F429I-DISCO\Exe\STM32F429I_DISCO_USBH-FS.axf" - 0 Error(s), 0 Warning(s).
+compiling main.c...
+../Src/main.c(45): warning:  #1295-D: Deprecated declaration swing_up - give arg types
+  void swing_up();
+../Src/main.c(47): warning:  #1295-D: Deprecated declaration balance_right - give arg types
+  void balance_right();
+../Src/main.c(48): warning:  #1295-D: Deprecated declaration balance_left - give arg types
+  void balance_left();
+../Src/main.c(93): warning:  #68-D: integer conversion resulted in a change of sign
+  		PIDInit(&e_pid,e_kp,e_ki,e_kd,0.01,-100,100,AUTOMATIC,DIRECT);
+../Src/main.c: 4 warnings, 0 errors
+linking...
+Program Size: Code=26220 RO-data=680 RW-data=176 ZI-data=6680  
+"STM32F429I-DISCO\Exe\STM32F429I_DISCO_USBH-FS.axf" - 0 Error(s), 4 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -50,7 +62,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.1.2
-Build Time Elapsed:  00:00:02
+Build Time Elapsed:  00:00:09
 </pre>
 </body>
 </html>

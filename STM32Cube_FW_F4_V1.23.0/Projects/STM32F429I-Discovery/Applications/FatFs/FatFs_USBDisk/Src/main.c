@@ -14,9 +14,12 @@
 #define ki 220
 #define kd 90
 
-#define e_kp 900
-#define e_ki 220
-#define e_kd 90
+#define e_kp 10
+#define e_ki 1.5
+#define e_kd 0
+
+#define peak_pos 1200
+#define peak_neg 64335
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
@@ -37,7 +40,7 @@ char Start_Write_USB[]="Start write USB";
 char Close_USB[] = "Close_USB";
 uint32_t count1=0,count2,temp,count_time=0,speed_percent;
 __IO bool flag=FALSE;
-uint32_t duty=8399;
+uint32_t duty=0;
 void speed(int32_t sp);
 void swing_up();
 void control_balance(int8_t delta_v);
@@ -83,10 +86,12 @@ int main(void)
 		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_14,GPIO_PIN_SET);
 		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_RESET);
 		speed(0);
-		HAL_Delay(1000);
+		//HAL_Delay(1000);
 		//last_speed=100;
 		
-		PIDInit(&pid,0.0,0.0,0.0,0.01,0,8399,AUTOMATIC,DIRECT);
+		PIDInit(&pid,kp,ki,kd,0.01,0,8399,AUTOMATIC,DIRECT);
+		PIDInit(&e_pid,e_kp,e_ki,e_kd,0.01,-100,100,AUTOMATIC,DIRECT);
+		//speed(100);
 		
     //PID_Init(&pid,20.0,100.0,5,1);
     /*##-1- Link the USB Host disk I/O driver ##################################*/
@@ -116,9 +121,13 @@ int main(void)
 //					{
 //						balance_test(1995);
 //					}
-					//if((TIM4->CNT >1190 && TIM4->CNT <1230)||(TIM4->CNT >64310 && TIM4->CNT <64350)){
-						
-						if(PPS_motor<0)
+					if((TIM4->CNT >1190 && TIM4->CNT <1210)||(TIM4->CNT >64325 && TIM4->CNT <64345))
+						{
+						if(TIM4->CNT >0xaaaa)
+							PIDSetpointSet(&e_pid,peak_pos);
+						else
+							PIDSetpointSet(&e_pid,peak_neg);
+						/*if(PPS_motor<0)
 						{
 							balance_right();
 							temp=1;
@@ -127,12 +136,13 @@ int main(void)
 						{
 							balance_left();
 							temp=2;
-						}
-					//}else swing_up();
-					
-					sprintf(buffer1,"%d;%d\r\n",PPS_motor,TIM4->CNT);
-					
-					HAL_UART_Transmit_IT(&huart1,(uint8_t *)buffer1,strlen(buffer1));
+						}*/
+					}//else swing_up();
+						
+					//sprintf(buffer1,"%d;%d\r\n",PPS_motor,TIM4->CNT);
+					//HAL_Delay(100);
+
+					//HAL_UART_Transmit_IT(&huart1,(uint8_t *)buffer1,strlen(buffer1));
             /* USB Host Background task */
             USBH_Process(&hUSBHost);
             //	MSC_Application();
@@ -169,11 +179,13 @@ void speed(int32_t sp)
 		sp=-100;
 	if(sp>0)
 	{
-		PID_Init(&pid,sp/4,kp,ki,kd);
+		//PID_Init(&pid,sp/4,kp,ki,kd);
+		PIDSetpointSet(&pid,sp/4);
 		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_14,GPIO_PIN_SET);
 	}else{
-		PID_Init(&pid,-sp/4,kp,ki,kd);
+		//PID_Init(&pid,-sp/4,kp,ki,kd);
+		PIDSetpointSet(&pid,-sp/4);
 		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_14,GPIO_PIN_RESET);
 		HAL_GPIO_WritePin(GPIOA,GPIO_PIN_12,GPIO_PIN_SET);
 	}
@@ -190,17 +202,6 @@ void swing_up()
 	}
 }
 
-void balance_test(uint32_t encoder)
-{
-		int temp;
-		temp = encoder - TIM4->CNT;
-		if(temp>0)
-		{
-			speed(PPS_motor+10);
-		}else {
-			speed(PPS_motor-10);
-		}
-}
 
 void balance_left()
 {
@@ -412,8 +413,8 @@ void control_balance(int8_t delta_v)
 				else 
 					speed(PPS_motor*3-delta_v);
 			}
-			sprintf(buffer1,"%d;%d\n",delta_v,PPS_motor);
-			HAL_UART_Transmit_IT(&huart1,(uint8_t *)buffer1,strlen(buffer1));
+			//sprintf(buffer1,"%d;%d\n",delta_v,PPS_motor);
+			//HAL_UART_Transmit_IT(&huart1,(uint8_t *)buffer1,strlen(buffer1));
 }
 
 /* function user define*/
@@ -425,7 +426,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			count_recent1 = temp+TIM4->CNT;
 			if(count_recent1 < 0xAAAA && count_update1 < 0xAAAA)
 				PPS=(int32_t)(count_recent1 - count_update1);
-		
 			if(count_recent1 > 0xAAAA&& count_update1 > 0xAAAA)
 				PPS=(int32_t)(count_recent1 - count_update1);
 			if(TIM3->CNT<0xAAAA)
@@ -440,7 +440,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		PIDInputSet(&pid,PSP);
 		PIDCompute(&pid);
 		duty=(uint32_t)PIDOutputGet(&pid);
-			
+		
+		if((TIM4->CNT >1190 && TIM4->CNT <1210)||(TIM4->CNT >64325 && TIM4->CNT <64345))
+		{
+			PIDInputSet(&e_pid,TIM4->CNT);
+			PIDCompute(&e_pid);
+			speed((uint32_t)PIDOutputGet(&e_pid));
+			sprintf(buffer1,"%d\n",(uint32_t)PIDOutputGet(&e_pid));
+			HAL_UART_Transmit_IT(&huart1,(uint8_t *)buffer1,strlen(buffer1));
+		}
 //		PPS = (float)(PSP_encoder_Update-(float)LPF_Beta*(PSP_encoder_Update-PPS));//lowpass filter
 //		if (PPS < 0) PSP = -PPS ;
 //			else PSP = PPS ;
@@ -450,7 +458,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		
 			/*PWM*/
 		TIM1->CCR1 = duty;
-		sprintf(buffer1,"%d;%d\n",duty,PPS_motor);
+		//sprintf(buffer1,"%d;%d\n",duty,PPS_motor);
 		PSP_Update=PPS_motor;
 		PSP_encoder_Update=PPS;
 		count_update1 =  temp+TIM4->CNT;
